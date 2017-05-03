@@ -1,0 +1,139 @@
+
+If you are loading enthought_python with OTHER modules / software 
+'module load enthought_python' FIRST then the rest of your software.
+
+Installing libs/modules /for/ this python or using it /in conjuction/ with other 
+compiled code requires gcc/4.8.2 (not auto-loaded) 
+
+To list the packages already installed in the enthought_python module:
+' pip list --format=columns | grep -i your-target '
+
+
+Use fullpaths for trimmomatic. Example usage:
+java -jar /data/apps/trimmomatic/0.35/trimmomatic-0.35.jar ...
+
+where ... are the other options you pass in to trimmomatic. More information
+on the website: http://www.usadellab.org/cms/?page=trimmomatic
+
+2583873 reads; of these:
+  2583873 (100.00%) were paired; of these:
+    2164033 (83.75%) aligned concordantly 0 times
+    418700 (16.20%) aligned concordantly exactly 1 time
+    1140 (0.04%) aligned concordantly >1 times
+    ----
+    2164033 pairs aligned concordantly 0 times; of these:
+      516209 (23.85%) aligned discordantly 1 time
+    ----
+    1647824 pairs aligned 0 times concordantly or discordantly; of these:
+      3295648 mates make up the pairs; of these:
+        3193146 (96.89%) aligned 0 times
+        96342 (2.92%) aligned exactly 1 time
+        6160 (0.19%) aligned >1 times
+38.21% overall alignment rate
+[E::hts_open_format] fail to open file '/bio/tgallagh/Stenotrophomonas/data/processed/bowtie2/raw/P33_raw.sam'
+samtools view: failed to open "/bio/tgallagh/Stenotrophomonas/data/processed/bowtie2/raw/P33_raw.sam" for reading: No such file or directory
+TrimmomaticPE: Started with arguments:
+ -phred33 P33_READ1.fastq P33_READ2.fastq /bio/tgallagh/Stenotrophomonas/data/processed/trimmed/P33_READ1_paired2.fastq /bio/tgallagh/Stenotrophomonas/data/processed/trimmed/P33_READ1_unpaired2.fastq /bio/tgallagh/Stenotrophomonas/data/processed/trimmed/P33_READ2_paired2.fastq /bio/tgallagh/Stenotrophomonas/data/processed/trimmed/P33_READ2_unpaired2.fastq ILLUMINACLIP:/bio/tgallagh/Stenotrophomonas/data/raw/adaptors/P33_CustomPrimers.sh:2:30:10 LEADING:25 TRAILING:25 SLIDINGWINDOW:4:20 MINLEN:50
+java.io.FileNotFoundException: /dfs1/bio/tgallagh/Stenotrophomonas/data/raw/adaptors/P33_CustomPrimers.sh (No such file or directory)
+	at java.io.FileInputStream.open(Native Method)
+	at java.io.FileInputStream.<init>(FileInputStream.java:146)
+	at org.usadellab.trimmomatic.fasta.FastaParser.parse(FastaParser.java:54)
+	at org.usadellab.trimmomatic.trim.IlluminaClippingTrimmer.loadSequences(IlluminaClippingTrimmer.java:110)
+	at org.usadellab.trimmomatic.trim.IlluminaClippingTrimmer.makeIlluminaClippingTrimmer(IlluminaClippingTrimmer.java:71)
+	at org.usadellab.trimmomatic.trim.TrimmerFactory.makeTrimmer(TrimmerFactory.java:32)
+	at org.usadellab.trimmomatic.Trimmomatic.createTrimmers(Trimmomatic.java:41)
+	at org.usadellab.trimmomatic.TrimmomaticPE.run(TrimmomaticPE.java:529)
+	at org.usadellab.trimmomatic.Trimmomatic.main(Trimmomatic.java:62)
+Input Read Pairs: 2583873 Both Surviving: 1905785 (73.76%) Forward Only Surviving: 255938 (9.91%) Reverse Only Surviving: 75702 (2.93%) Dropped: 346448 (13.41%)
+TrimmomaticPE: Completed successfully
+[bsw2_aln] read 57525 sequences (10000041 bp)...
+[bsw2_aln] read 57353 sequences (10000101 bp)...
+[bsw2_aln] read 57621 sequences (10000117 bp)...
+[bsw2_aln] read 57733 sequences (10000061 bp)...
+[bsw2_aln] read 56720 sequences (10000044 bp)...
+[bsw2_aln] read 58111 sequences (10000039 bp)...
+[bsw2_aln] read 57702 sequences (10000247 bp)...
+[bsw2_aln] read 57710 sequences (10000077 bp)...
+[bsw2_aln] read 57327 sequences (10000053 bp)...
+[bsw2_aln] read 57226 sequences (10000004 bp)...
+[bsw2_aln] read 57170 sequences (10000014 bp)...
+[bsw2_aln] read 57324 sequences (10000125 bp)...
+[bsw2_aln] read 56850 sequences (10000038 bp)...
+[bsw2_aln] read 56942 sequences (10000106 bp)...
+[bsw2_aln] read 57546 sequences (10000013 bp)...
+[bsw2_aln] read 57705 sequences (10000254 bp)...
+[bsw2_aln] read 57391 sequences (10000051 bp)...
+[bsw2_aln] read 57013 sequences (10000036 bp)...
+[bsw2_aln] read 57075 sequences (10000112 bp)...
+[bsw2_aln] read 56718 sequences (10000109 bp)...
+[bsw2_aln] read 57051 sequences (10000175 bp)...
+[bsw2_aln] read 57055 sequences (10000107 bp)...
+[bsw2_aln] read 57227 sequences (10000212 bp)...
+[bsw2_aln] read 57556 sequences (10000042 bp)...
+[bsw2_aln] read 57111 sequences (10000034 bp)...
+[bsw2_aln] read 56911 sequences (10000067 bp)...
+[bsw2_aln] read 56798 sequences (10000012 bp)...
+[bsw2_aln] read 56805 sequences (10000028 bp)...
+[bsw2_aln] read 57067 sequences (10000014 bp)...
+[bsw2_aln] read 57337 sequences (10000029 bp)...
+[bsw2_aln] read 56584 sequences (10000192 bp)...
+[bsw2_aln] read 57304 sequences (10000134 bp)...
+[bsw2_aln] read 64241 sequences (10000224 bp)...
+[bsw2_aln] read 66051 sequences (10000094 bp)...
+[bsw2_aln] read 64177 sequences (10000066 bp)...
+[bsw2_aln] read 63377 sequences (10000056 bp)...
+[bsw2_aln] read 83706 sequences (10000127 bp)...
+[bsw2_aln] read 2634 sequences (295553 bp)...
+[bsw2_aln] read 61671 sequences (6027115 bp)...
+[bsw2_aln] read 61671 sequences (8376414 bp)...
+2175320 reads; of these:
+  2175320 (100.00%) were unpaired; of these:
+    89303 (4.11%) aligned 0 times
+    2071458 (95.23%) aligned exactly 1 time
+    14559 (0.67%) aligned >1 times
+95.89% overall alignment rate
+61659 reads; of these:
+  61659 (100.00%) were paired; of these:
+    61651 (99.99%) aligned concordantly 0 times
+    7 (0.01%) aligned concordantly exactly 1 time
+    1 (0.00%) aligned concordantly >1 times
+    ----
+    61651 pairs aligned concordantly 0 times; of these:
+      50052 (81.19%) aligned discordantly 1 time
+    ----
+    11599 pairs aligned 0 times concordantly or discordantly; of these:
+      23198 mates make up the pairs; of these:
+        21427 (92.37%) aligned 0 times
+        917 (3.95%) aligned exactly 1 time
+        854 (3.68%) aligned >1 times
+82.62% overall alignment rate
+[bam_sort_core] merging from 2 files...
+4591 GFF lines processed.
+100000 SAM alignment records processed.
+200000 SAM alignment records processed.
+300000 SAM alignment records processed.
+400000 SAM alignment records processed.
+500000 SAM alignment records processed.
+600000 SAM alignment records processed.
+700000 SAM alignment records processed.
+800000 SAM alignment records processed.
+900000 SAM alignment records processed.
+1000000 SAM alignment records processed.
+1100000 SAM alignment records processed.
+1200000 SAM alignment records processed.
+1300000 SAM alignment records processed.
+1400000 SAM alignment records processed.
+1500000 SAM alignment records processed.
+1600000 SAM alignment records processed.
+1700000 SAM alignment records processed.
+1800000 SAM alignment records processed.
+1900000 SAM alignment records processed.
+2000000 SAM alignment records processed.
+2086017 SAM alignments  processed.
+4591 GFF lines processed.
+Warning: Read SN591:417:HCFHWBCXX:1:1211:1200:66770 claims to have an aligned mate which could not be found in an adjacent line.
+Warning: Malformed SAM line: MRNM != '*' although flag bit &0x0008 set
+Warning: 96582 reads with missing mate encountered.
+99585 SAM alignment pairs processed.
+paste: /bio/tgallagh/Stenotrophomonas/data/processed/HTSeq/P33_singles.xls: No such file or directory
+mkdir: cannot create directory `/bio/tgallagh/Stenotrophomonas/data/processed/bowtie2/coverage': File exists
