@@ -1,0 +1,81 @@
+#RAW READS SUMMARY
+Raw_Fwd_Read_P30 	 4175209
+Raw_Rev_Read_P30 	 4242901
+Raw_Fwd_Read_P31 	 3103314
+Raw_Rev_Read_P31 	 3154781
+Raw_Fwd_Read_P32 	 4508204
+Raw_Rev_Read_P32 	 4537549
+Raw_Fwd_Read_P33 	 2819949
+Raw_Rev_Read_P33 	 2834468
+Raw_Fwd_Read_P34 	 4713410
+Raw_Rev_Read_P34 	 4789735
+Raw_Fwd_Read_P35 	 6679151
+Raw_Rev_Read_P35 	 6745306
+Raw_Fwd_Read_P36 	 5200330
+Raw_Rev_Read_P36 	 5225468
+#TRIMMOMATIC OUTPUT SUMMARY
+#READS WHERE BOTH MATES PASSES QF
+Trimm_Fwd_PairedRead_P30 	 3111733
+Trimm_Rev_PairedRead_P30 	 3180415
+Trimm_Fwd_PairedRead_P31 	 2304309
+Trimm_Rev_PairedRead_P31 	 2356874
+Trimm_Fwd_PairedRead_P32 	 3293919
+Trimm_Rev_PairedRead_P32 	 3330567
+Trimm_Fwd_PairedRead_P33 	 2075572
+Trimm_Rev_PairedRead_P33 	 2097296
+Trimm_Fwd_PairedRead_P34 	 3400279
+Trimm_Rev_PairedRead_P34 	 3487990
+Trimm_Fwd_PairedRead_P35 	 4852799
+Trimm_Rev_PairedRead_P35 	 4931173
+Trimm_Fwd_PairedRead_P36 	 3866379
+Trimm_Rev_PairedRead_P36 	 3896357
+#READS WHERE 1 MATE PASSES QF
+Trimm_Fwd_Read_P30 	 393971
+Trimm_Rev_Read_P30 	 147463
+Trimm_Fwd_Read_P31 	 296683
+Trimm_Rev_Read_P31 	 109794
+Trimm_Fwd_Read_P32 	 446158
+Trimm_Rev_Read_P32 	 150037
+Trimm_Fwd_Read_P33 	 293294
+Trimm_Rev_Read_P33 	 89864
+Trimm_Fwd_Read_P34 	 521031
+Trimm_Rev_Read_P34 	 137881
+Trimm_Fwd_Read_P35 	 706480
+Trimm_Rev_Read_P35 	 215841
+Trimm_Fwd_Read_P36 	 497410
+Trimm_Rev_Read_P36 	 182762
+#OVERLAPPING PE READS
+Overlapping_reads_P30 	 2858093
+Overlapping_reads_P31 	 2114617
+Overlapping_reads_P32 	 3027559
+Overlapping_reads_P33 	 1914120
+Overlapping_reads_P34 	 3123119
+Overlapping_reads_P35 	 4466137
+Overlapping_reads_P36 	 3532977
+#FINAL CLEANED READS AFTER RRNA REMOVAL
+SE_Final_P30 	 3220364
+Forward_Final_P30 	 100358
+PERCENT RAW READS THAT ALIGNED
+P30_raw_alignment 3006159 + 0 mapped (39.28% : N/A)
+P31_raw_alignment 2271820 + 0 mapped (39.91% : N/A)
+P32_raw_alignment 3253989 + 0 mapped (39.36% : N/A)
+P33_raw_alignment 1974600 + 0 mapped (38.21% : N/A)
+P34_raw_alignment 3313157 + 0 mapped (38.35% : N/A)
+P35_raw_alignment 4616713 + 0 mapped (37.73% : N/A)
+P36_raw_alignment 3909197 + 0 mapped (40.98% : N/A)
+PERCENT PROCESSED PAIRED READS THAT ALIGNED
+Final_Paired_Align_P30 	 154932 + 0 mapped (100.00% : N/A)
+Final_Paired_Align_P31 	 114131 + 0 mapped (100.00% : N/A)
+Final_Paired_Align_P32 	 177884 + 0 mapped (100.00% : N/A)
+Final_Paired_Align_P33 	 101891 + 0 mapped (100.00% : N/A)
+Final_Paired_Align_P34 	 186244 + 0 mapped (100.00% : N/A)
+Final_Paired_Align_P35 	 247203 + 0 mapped (100.00% : N/A)
+Final_Paired_Align_P36 	 224584 + 0 mapped (100.00% : N/A)
+PERCENT PROCESSED OVERLAPPED READS (SE) THAT ALIGNED
+Final_Overlapped_Align_P30 	 3094753 + 0 mapped (100.00% : N/A)
+Final_Overlapped_Align_P31 	 2297460 + 0 mapped (100.00% : N/A)
+Final_Overlapped_Align_P32 	 3293862 + 0 mapped (100.00% : N/A)
+Final_Overlapped_Align_P33 	 2086017 + 0 mapped (100.00% : N/A)
+Final_Overlapped_Align_P34 	 3421158 + 0 mapped (100.00% : N/A)
+Final_Overlapped_Align_P35 	 4832513 + 0 mapped (100.00% : N/A)
+Final_Overlapped_Align_P36 	 3799115 + 0 mapped (100.00% : N/A)
