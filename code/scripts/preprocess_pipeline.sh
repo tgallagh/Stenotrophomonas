@@ -49,7 +49,7 @@ RAWDEST=/bio/tgallagh/Stenotrophomonas/data/processed/bowtie2/raw/
 ## build index in command line
 #bowtie2-build $ref/Sm_genome.final.scaffolds_CUT.fasta $ref/Sm_index
 
-bowtie2 --very-fast -x $ref/Sm_index -1 $input\READ1.fastq -2 $input\READ2.fastq  -S $RAWDEST$input\_raw.sam
+bowtie2 --very-fast -x $ref/Sm_index -1 $input\READ1.fastq -2 $input\READ2.fastq  -S $RAWDEST$input\raw.sam
 samtools view -bS $RAWDEST$input\raw.sam | samtools sort > $RAWDEST$input\raw.sorted.bam
 
 #############################
