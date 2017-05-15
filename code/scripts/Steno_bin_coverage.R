@@ -1,5 +1,5 @@
 #### Steno RNA seq
-#### 05/04/17
+#### updated 05/15/17
 #### R version 3.3.1
 require(dplyr)
 require(ggplot2)
@@ -199,21 +199,106 @@ pH5_pH7 <- averages_bins[,1:7] %>%
   filter(pH7 >1) %>%
   filter(log2fc_ph57 > 1 | log2fc_ph57 < -1) 
 
+################################
 ######## Operon identification
+###############################
+
 ## function to identify operons (maybe?)
 ## set number of bins to 20 (2000 bp up or down regulated)
 
-number_bins=20
-df = ph5_ph7
-starts <- seq(1, nrow(df))
-for(i in 1:starts) {
-  
-} 
+### this is the function
+sig.operons.function <- function(df, number_bins, df_name) {
+previous.position = 0
+counter = 0
+df_output <- c()
+temp.operon <- c()
+n=0
+df = pH5_pH7
+for (i in 1:nrow(df)) {
+  if (df[i,4] == previous.position + 100) {
+    counter = counter + 1
+  } else {
+    if (counter > number_bins) {
+      n= n+1
+      temp.operon <- df[(i-(counter-1)):i-1,]
+      temp.operon <- temp.operon %>%
+        mutate(operon_no = n)
+      df_output <- rbind(df_output, temp.operon)
+    }
+    counter=1
+  }
+  previous.position=df[i,4]
+}
+assign(paste(df_name),df_output, envir=.GlobalEnv)
+}
+
+### user inputs input dataframe, number of bins (20 = 2000 bp limit), and output df name
+sig.operons.function(pH5_pH7, 20, "pH5_pH7_operons")
+
+###### 
+###### filter gtf table so that we get genes falling within this operon
+
+data=subset(pH5_pH7_operons, operon_no == "1")
+scaffold.position<-data$scaffold.position
+scaffold.position.1 <- scaffold.position[1]
+scaffold.position.last <- scaffold.position[length(scaffold.position)]
+subsetgtf <- subset(GTF, scaffold == "scaffold3.1")
+subsetgtf<- subsetgtf %>% filter (start > scaffold.position.1 & stop < scaffold.position.last)
+# convert scaffold number to genome position to fit onto the graph 
+subsetgtf <- subsetgtf %>% 
+  mutate(genome.start = round(((980201-67192) + start)))
+subsetgtf <- subsetgtf %>% 
+  mutate(genome.stop = round(((980201-67192) + stop)))
+
+######
+plot <- ggplot()
+plot + geom_line(data=data, aes(x=bp, y=pH5, color="ph5"))+
+  geom_line(data=data, aes(x=bp, y=pH7, color="ph7"), size=1) +
+  geom_line(data=data, aes(x=bp, y=pH9, color="ph9"), size=1) +
+  theme(axis.text.x=element_text(size=14),
+        axis.text.y=element_text(size=14, colour="black"),
+        axis.title.y=element_text(size=16),
+        axis.title.x=element_text(size=14, colour="black"),
+        panel.grid.major = element_blank(), panel.grid.minor = element_blank(),
+        panel.background = element_blank(), axis.line = element_line(colour = "black"))+ 
+  scale_color_manual(values=cols, name="Condition") + 
+  #geom_segment()+
+  xlab("Genome Position") +
+  ylab("Counts per million")+
+  ggtitle("Downregulated 'operon' in pH5")+
+  geom_segment(data=subsetgtf[1,], aes(x=genome.start, xend=genome.stop, y=0, yend=0), color="purple",
+               size=4)+
+  geom_label(data=subsetgtf[1,], aes(label=gene, x=genome.start,y=-25), fill="purple", size=3) +
+  geom_segment(data=subsetgtf[2,], aes(x=genome.start, xend=genome.stop, y=0, yend=0), color="green",
+               size=4)+
+  geom_label(data=subsetgtf[2,], aes(label=gene, x=982000,y=-50), fill="green", size=3) +
+  geom_segment(data=subsetgtf[3,], aes(x=genome.start, xend=genome.stop, y=0, yend=0), color="purple",
+               size=4)+
+  geom_label(data=subsetgtf[3,], aes(label=gene, x=genome.start,y=-75), fill="purple", size=3) +
+  geom_segment(data=subsetgtf[4,], aes(x=genome.start, xend=genome.stop, y=0, yend=0), color="green",
+               size=4)+
+  geom_label(data=subsetgtf[4,], aes(label=gene, x=genome.start,y=-100), fill="green", size=3) +
+  geom_segment(data=subsetgtf[5,], aes(x=genome.start, xend=genome.stop, y=0, yend=0), color="purple",
+               size=4)+
+geom_label(data=subsetgtf[5,], aes(label=gene, x=genome.start,y=-125), fill="purple", size=3) 
 
 
-n <- length(starts)
-chunkbps <- numeric(n)
-chunkstats<- numeric(n)
-for(i in 1:n){chunk <- P30[,3][starts[i]:(starts[i]+100-1)]
+
+plot <- ggplot()
+plot + geom_point(data=data, aes(x=bp, y=log2fc_ph57))
+                  
+                  
+  geom_line(data=data, aes(x=bp, y=pH7, color="ph7"), size=1) +
+  geom_line(data=data, aes(x=bp, y=pH9, color="ph9"), size=1) +
+  theme(axis.text.x=element_text(size=14),
+        axis.text.y=element_text(size=14, colour="black"),
+        axis.title.y=element_text(size=16),
+        axis.title.x=element_text(size=14, colour="black"),
+        panel.grid.major = element_blank(), panel.grid.minor = element_blank(),
+        panel.background = element_blank(), axis.line = element_line(colour = "black"))+ 
+  scale_color_manual(values=cols, name="Condition") + 
+  #geom_segment()+
+  ylab("Counts per million")+
+  xlab("Genome Position")
 
 
