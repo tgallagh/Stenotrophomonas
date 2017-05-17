@@ -105,11 +105,11 @@ make.gene.plots(x)
 
 #function for binning:
 slidingwindow <- function(windowsize, inputseq){
-  starts <- seq(1, length(P30[,3])-100, by = 100)
+  starts <- seq(1, length(inputseq-100), by = 100)
   n <- length(starts)
   chunkbps <- numeric(n)
   chunkstats<- numeric(n)
-  for(i in 1:n){chunk <- P30[,3][starts[i]:(starts[i]+100-1)]
+  for(i in 1:n){chunk <- inputseq[starts[i]:(starts[i]+100-1)]
   chunkmean <- mean(chunk)
   chunkstdv<-sd(chunk)
   chunkbps[i] <- chunkmean
@@ -121,7 +121,7 @@ for (sample in sample.names) {
   temp <- get(sample)
   temp$bp <- rownames(temp)
   temp$sample <- sample
-  temp.list<-slidingwindow(100, temp[,3])
+  temp.list<-slidingwindow(100, temp[,4])
   df <- data.frame(temp.list[[1]], temp.list[[2]], temp.list[[3]])
   colname<-c("bp","binned_cpm","sd")
   colnames(df)<-colname
@@ -205,7 +205,7 @@ pH5_pH7 <- averages_bins[,1:7] %>%
 
 ## function to identify operons (maybe?)
 ## set number of bins to 20 (2000 bp up or down regulated)
-
+example <- pH5_pH7[1:20,]
 ### this is the function
 sig.operons.function <- function(df, number_bins, df_name) {
 previous.position = 0
@@ -213,7 +213,6 @@ counter = 0
 df_output <- c()
 temp.operon <- c()
 n=0
-df = pH5_pH7
 for (i in 1:nrow(df)) {
   if (df[i,4] == previous.position + 100) {
     counter = counter + 1
@@ -229,11 +228,12 @@ for (i in 1:nrow(df)) {
   }
   previous.position=df[i,4]
 }
-assign(paste(df_name),df_output, envir=.GlobalEnv)
+assign(paste(df_name),df_output, envir = .GlobalEnv)
+
 }
 
 ### user inputs input dataframe, number of bins (20 = 2000 bp limit), and output df name
-sig.operons.function(pH5_pH7, 20, "pH5_pH7_operons")
+sig.operons.function(pH5_pH7, 19, "pH5_pH7_operons")
 
 ###### 
 ###### filter gtf table so that we get genes falling within this operon
