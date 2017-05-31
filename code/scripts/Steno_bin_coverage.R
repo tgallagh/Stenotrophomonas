@@ -1,10 +1,9 @@
 #### Steno RNA seq
-#### updated 05/15/17
+#### updated 05/18/17
 #### R version 3.3.1
 require(dplyr)
 require(ggplot2)
 require(reshape2)
-
 
 ### Assign labels and info to variables 
 sample.names <- c("P30", "P31", "P32", "P33", "P34", "P35", "P36")
@@ -25,7 +24,7 @@ for (file in sample.names) {
 }
 
 #GTF file of annotated genes from RAST
-GTF <- read.delim(file = "/Users/Tara/GoogleDrive/P1_RNAseq/data/processed/annotations/6666666.246352.gtf",
+GTF <- read.delim(file = "~/GoogleDrive/Stenotrophomonas/data/processed/6666666.230262.gtf",
                   header=FALSE)
 GTF$gene <- GTF$V9
 # rename columns
@@ -69,6 +68,10 @@ sample.colors<- c("P30"="red", "P31" = "red" ,
                   "P32" = "black", "P33" = "black",
                   "P34" = "black", "P35" = "blue" ,
                   "P36" = "blue") 
+
+
+### this function will give single bp resolution for a gene of interest
+
 make.gene.plots <- function(x) {
 GENE.INFO <- subset(GTF, gene == x)
 GENE.START <- GENE.INFO$start
@@ -94,8 +97,57 @@ panel.background = element_blank(), axis.line = element_line(colour = "black"))+
 }
 
 ### make.gene.plots(x) <--- change x to put gene of interest 
-x = "Alginate biosynthesis protein AlgJ"
+x = "DNA gyrase subunit A (EC 5.99.1.3);Ontology_term=KEGG_ENZYME:5.99.1.3"
 make.gene.plots(x)
+x = GTF[2727,10] #"reca"
+make.gene.plots(x)
+x = GTF[3924,10] #transcription termination factor rho
+make.gene.plots(x)
+x = GTF[3572,10] #"DNA directed RNA polymerase Beta subunit"
+make.gene.plots(x) 
+x = GTF[3864,10] #"DNA directed RNA polymerase Beta subunit"
+make.gene.plots(x)
+
+#pick housekeeping genes based on this criteria:
+  # CPM across the gene > 1
+  # list of housekeeping genes: https://www.ncbi.nlm.nih.gov/pubmed/26149127
+# determine change in average coverage for those housekeeping genes
+
+calculate.coverage <- function(HKG) {
+  GENE.INFO <- subset(GTF, gene == HKG)
+  GENE.START <- GENE.INFO$start
+  GENE.STOP <- GENE.INFO$stop 
+  GENE.SCAFFOLD <- as.character(GENE.INFO$scaffold)
+  SAMPLE.GENE <- subset(ALL.COV, scaffold ==GENE.SCAFFOLD)
+  SAMPLE.GENE <- SAMPLE.GENE %>%
+    filter(position > GENE.START & position < GENE.STOP)
+  PH5.AVERAGE <- mean((SAMPLE.GENE$P30 + SAMPLE.GENE$P31)/2)
+  PH7.AVERAGE <- mean((SAMPLE.GENE$P32 + SAMPLE.GENE$P33 +
+                         SAMPLE.GENE$P34)/3)
+  PH9.AVERAGE <- mean((SAMPLE.GENE$P35 + SAMPLE.GENE$P36)/2)
+  HKG.AVERAGE <- cbind(PH5.AVERAGE, PH7.AVERAGE, PH9.AVERAGE)
+  assign("HKG.avg",HKG.AVERAGE, envir = .GlobalEnv)
+}
+HKG = "DNA gyrase subunit A (EC 5.99.1.3);Ontology_term=KEGG_ENZYME:5.99.1.3"
+calculate.coverage(HKG)
+housekeeping <- HKG.avg
+HKG = GTF[2727,10] #"reca"
+calculate.coverage(HKG)
+housekeeping <- rbind(housekeeping, HKG.avg)
+HKG = GTF[3924,10] #transcription termination factor rho
+calculate.coverage(HKG)
+housekeeping <- rbind(housekeeping, HKG.avg)
+HKG = GTF[3572,10] #"DNA directed RNA polymerase Beta subunit"
+calculate.coverage(HKG)
+housekeeping <- rbind(housekeeping, HKG.avg)
+HKG = GTF[3864,10] #"DNA directed RNA polymerase Beta subunit"
+calculate.coverage(HKG)
+housekeeping <- rbind(housekeeping, HKG.avg)
+housekeeping<-colMeans(housekeeping)/100
+pH9.change <- housekeeping[3] / housekeeping[2]
+pH5.change <- housekeeping[1] / housekeeping[2]
+pH7.change <- 1 
+housekeeping.final<- cbind(pH5.change, pH7.change, pH9.change)
 
 ###############################
 ################################
@@ -117,6 +169,8 @@ slidingwindow <- function(windowsize, inputseq){
   return(list(starts,chunkbps,chunkstats))}
 
 #loop over samples
+
+### bins for cpm
 for (sample in sample.names) {
   temp <- get(sample)
   temp$bp <- rownames(temp)
@@ -130,17 +184,130 @@ for (sample in sample.names) {
   assign(df.name,df2)
 }
 
+
+### bins for coverage 
+for (sample in sample.names) {
+  temp <- get(sample)
+  temp$bp <- rownames(temp)
+  temp$sample <- sample
+  temp.list<-slidingwindow(100, temp[,3])
+  df <- data.frame(temp.list[[1]], temp.list[[2]], temp.list[[3]])
+  colname<-c("bp","binned_cov","sd")
+  colnames(df)<-colname
+  df2 <- merge(x=df, y=temp, by="bp")
+  df.name <- paste(sample,"bins_cov", sep="_")
+  assign(df.name,df2)
+}
+
+# make new dataframes that take into account housekeeping gene normalization
+P30_bins<- P30_bins %>%
+  mutate(hkg_norm = binned_cpm / housekeeping.final[1])
+P31_bins<- P31_bins %>%
+  mutate(hkg_norm = binned_cpm / housekeeping.final[1])
+P32_bins<- P32_bins %>%
+  mutate(hkg_norm = binned_cpm / housekeeping.final[2])
+P33_bins<- P33_bins %>%
+  mutate(hkg_norm = binned_cpm / housekeeping.final[2])
+P34_bins<- P34_bins %>%
+  mutate(hkg_norm = binned_cpm / housekeeping.final[2])
+P35_bins<- P35_bins %>%
+  mutate(hkg_norm = binned_cpm / housekeeping.final[3])
+P36_bins<- P36_bins %>%
+  mutate(hkg_norm = binned_cpm / housekeeping.final[3])
+
+
+#### calculate average coverage for each sample
+
+
+  ### INPUT DATAFRAME MUST HAVE COLUMN LABELED "CPM"
+
+
+#### put dataframes into list to use apply function 
+LIST <- list(P30_bins, P31_bins, P32_bins,
+               P33_bins, P34_bins, P35_bins, 
+               P36_bins)
+
+#### Function for calculating average CPM across genome 
+average.coverage <- function(INPUT,OUTPUT){
+  cpm.col <- as.numeric(INPUT$binned_cpm)
+  cpm.col.mean <- mean(cpm.col, na.rm=TRUE)
+  assign(paste(OUTPUT),cpm.col.mean, envir = .GlobalEnv)
+}
+
+#apply to list of dataframes
+allcoverageaverage<-lapply(LIST, FUN= average.coverage, OUTPUT="cov")
+allcoverageaverage <- unlist(allcoverageaverage)
+allcoverageaverage <- cbind(allcoverageaverage, sample.names)
+
+#### Function for calculating average coverage using non-normalized bp coverage
+average.coverage.raw <- function(INPUT,OUTPUT){
+  cpm.col <- as.numeric(INPUT$binned_cov)
+  cpm.col.mean <- mean(cpm.col, na.rm=TRUE)
+  assign(paste(OUTPUT),cpm.col.mean, envir = .GlobalEnv)
+}
+
+LIST2 <- list(P30_bins_cov, P31_bins_cov, P32_bins_cov,
+             P33_bins_cov, P34_bins_cov, P35_bins_cov, 
+             P36_bins_cov)
+
+allcoverageaverage.bp<-lapply(LIST2, FUN= average.coverage.raw, OUTPUT="cov")
+allcoverageaverage.bp <- unlist(allcoverageaverage.bp)
+allcoverageaverage.bp <- cbind(allcoverageaverage.bp, sample.names)
+
+
+P30_bins<- P30_bins %>%
+  mutate(avg_norm = binned_cpm * 30 / as.numeric(allcoverageaverage[1,1]))
+
+P31_bins<- P31_bins %>%
+  mutate(avg_norm = binned_cpm * 30 / as.numeric(allcoverageaverage[2,1]))
+
+P32_bins<- P32_bins %>%
+  mutate(avg_norm = binned_cpm * 30 / as.numeric(allcoverageaverage[3,1]))
+
+P33_bins<- P33_bins %>%
+  mutate(avg_norm = binned_cpm * 30 / as.numeric(allcoverageaverage[4,1]))
+
+P34_bins<- P34_bins %>%
+  mutate(avg_norm = binned_cpm * 30/ as.numeric(allcoverageaverage[5,1]))
+
+P35_bins<- P35_bins %>%
+  mutate(avg_norm = binned_cpm * 30 / as.numeric(allcoverageaverage[6,1]))
+
+P36_bins<- P36_bins %>%
+  mutate(avg_norm = binned_cpm * 30 / as.numeric(allcoverageaverage[7,1]))
+
+
+#### calculate mean basepair coverage of all samples
+mean(as.numeric(allcoverageaverage.bp[,1]))
+
+P30_bins_cov<- P30_bins_cov %>%
+  mutate(avg_norm = binned_cov * 119 / as.numeric(allcoverageaverage.bp[1,1]))
+
+P31_bins_cov<- P31_bins_cov %>%
+  mutate(avg_norm = binned_cov * 119 / as.numeric(allcoverageaverage.bp[2,1]))
+
+P32_bins_cov<- P32_bins_cov %>%
+  mutate(avg_norm = binned_cov * 119 / as.numeric(allcoverageaverage.bp[3,1]))
+
+P33_bins_cov<- P33_bins_cov %>%
+  mutate(avg_norm = binned_cov * 119 / as.numeric(allcoverageaverage.bp[4,1]))
+
+P34_bins_cov<- P34_bins_cov %>%
+  mutate(avg_norm = binned_cov * 119 / as.numeric(allcoverageaverage.bp[5,1]))
+
+P35_bins_cov<- P35_bins_cov %>%
+  mutate(avg_norm = binned_cov * 119 / as.numeric(allcoverageaverage.bp[6,1]))
+
+P36_bins_cov<- P36_bins_cov %>%
+  mutate(avg_norm = binned_cov * 119 / as.numeric(allcoverageaverage.bp[7,1]))
+
 #### plot individual samples
 plot <- ggplot()
 #color panel for different conditions 
 cols <- c("ph5"="red","ph7"="black","ph9"="blue")
-plot + geom_line(data=P30_bins, aes(x=bp, y=binned_cpm, color="ph5"), size=4)+
-  geom_line(data=P31_bins, aes(x=bp, y=binned_cpm, color="ph5"), size=4)+
-  geom_line(data=P32_bins, aes(x=bp, y=binned_cpm, color="ph7"), size=3)+
-  geom_line(data=P33_bins, aes(x=bp, y=binned_cpm, color="ph7"), size=3)+
-  geom_line(data=P34_bins, aes(x=bp, y=binned_cpm, color="ph7"), size=3)+
-  geom_line(data=P35_bins, aes(x=bp, y=binned_cpm, color="ph9"), size=1)+
-  geom_line(data=P36_bins, aes(x=bp, y=binned_cpm, color="ph9"), size=1)+
+YVALUE = "avg_norm"
+
+plot + geom_line(data=P30_bins, aes_string(x="bp", y=YVALUE, color=shQuote("ph5")), size=4)+
   scale_color_manual(values=cols, name="Condition")+
   theme(axis.text.x=element_text(size=14),
         axis.text.y=element_text(size=14, colour="black"),
@@ -148,15 +315,79 @@ plot + geom_line(data=P30_bins, aes(x=bp, y=binned_cpm, color="ph5"), size=4)+
         axis.title.x=element_text(size=14, colour="black"),
         panel.grid.major = element_blank(), panel.grid.minor = element_blank(),
         panel.background = element_blank(), axis.line = element_line(colour = "black"))+ 
-  ylab("Counts per million")+
-  xlab("Genome Position")
+  ylab("counts per million")+
+  xlab("Genome Position") +
+  ggtitle("Coverage of all samples normalized by \n mean genome-wide coverage")+
+  geom_line(data=P31_bins, aes_string(x="bp", y=YVALUE, color=shQuote("ph5")), size=4)+
+   geom_line(data=P32_bins, aes_string(x="bp", y=YVALUE, color=shQuote("ph7")),  size=3)+
+  geom_line(data=P33_bins, aes_string(x="bp", y=YVALUE, color=shQuote("ph7")), size=3)+
+  geom_line(data=P34_bins, aes_string(x="bp", y=YVALUE, color=shQuote("ph7")), size=3)+
+  geom_line(data=P35_bins, aes_string(x="bp", y=YVALUE, color=shQuote("ph9")), size=1)+
+  geom_line(data=P36_bins, aes_string(x="bp", y=YVALUE, color=shQuote("ph9")), size=1)+
+  ylim(0,300000)
+
+cols2 <-  c("ph5"="pink","ph7"="gray","ph9"="#42cbf4", 
+            "ph5_hkg" = "red", "ph7_hkg" = "black", 
+            "ph9_hkg" = "blue")
+
+plot + 
+  geom_line(data=P30_bins, aes(x=bp, y=binned_cpm, color="ph5"), size=5)+
+  geom_line(data=P31_bins, aes(x=bp, y=binned_cpm,color="ph5"), size=5)+
+  geom_line(data=P32_bins, aes(x=bp, y=binned_cpm,color="ph7"), size=4)+
+  geom_line(data=P33_bins, aes(x=bp, y=binned_cpm,color="ph7"), size=4)+
+  geom_line(data=P34_bins, aes(x=bp, y=binned_cpm,color="ph7"), size=4)+
+  #geom_line(data=P35_bins, aes(x=bp, y=binned_cpm,color="ph9"), size=3)+
+  #geom_line(data=P36_bins, aes(x=bp, y=binned_cpm,color="ph9"), size=3)+
+  geom_line(data=P30_bins, aes_string(x="bp", y=YVALUE, color=shQuote("ph5_hkg")), size=2)+
+  scale_color_manual(values=cols2, name="Condition")+
+  theme(axis.text.x=element_text(size=14),
+        axis.text.y=element_text(size=14, colour="black"),
+        axis.title.y=element_text(size=16),
+        axis.title.x=element_text(size=14, colour="black"),
+        panel.grid.major = element_blank(), panel.grid.minor = element_blank(),
+        panel.background = element_blank(), axis.line = element_line(colour = "black"))+ 
+  ylab("counts per million")+
+  xlab("Genome Position") +
+  ggtitle("Comparison of normalization steps")+
+  geom_line(data=P31_bins, aes_string(x="bp", y=YVALUE, color=shQuote("ph5_hkg")), size=2)+
+  geom_line(data=P32_bins, aes_string(x="bp", y=YVALUE, color=shQuote("ph7_hkg")),  size=1.5)+
+  geom_line(data=P33_bins, aes_string(x="bp", y=YVALUE, color=shQuote("ph7_hkg")), size=1.5)+
+  geom_line(data=P34_bins, aes_string(x="bp", y=YVALUE, color=shQuote("ph7_hkg")), size=1.5)+
+ # geom_line(data=P35_bins, aes_string(x="bp", y=YVALUE, color=shQuote("ph9_hkg")), size=1)+
+  #geom_line(data=P36_bins, aes_string(x="bp", y=YVALUE, color=shQuote("ph9_hkg")), size=1)+
+  ylim(0,300000)
+  
+
+#### plot of non-normalized binned bp coverage
+
+YVALUE = "avg_norm"
+plot + geom_line(data=P30_bins_cov, aes_string(x="bp", y=YVALUE, color=shQuote("ph5")), size=4)+
+  scale_color_manual(values=cols, name="Condition")+
+  theme(axis.text.x=element_text(size=14),
+        axis.text.y=element_text(size=14, colour="black"),
+        axis.title.y=element_text(size=16),
+        axis.title.x=element_text(size=14, colour="black"),
+        panel.grid.major = element_blank(), panel.grid.minor = element_blank(),
+        panel.background = element_blank(), axis.line = element_line(colour = "black"))+ 
+  ylab("counts per million")+
+  xlab("Genome Position") +
+  ggtitle("COVERAGE OF RNA READS ACROSS GENOME
+          NORMALIZED BY GENOME-WIDE EXPRESSION")+
+  geom_line(data=P31_bins_cov, aes_string(x="bp", y=YVALUE, color=shQuote("ph5")), size=4)+
+  geom_line(data=P32_bins_cov, aes_string(x="bp", y=YVALUE, color=shQuote("ph7")),  size=3)+
+  geom_line(data=P33_bins_cov, aes_string(x="bp", y=YVALUE, color=shQuote("ph7")), size=3)+
+  geom_line(data=P34_bins_cov, aes_string(x="bp", y=YVALUE, color=shQuote("ph7")), size=3)+
+  geom_line(data=P35_bins_cov, aes_string(x="bp", y=YVALUE, color=shQuote("ph9")), size=1)+
+  geom_line(data=P36_bins_cov, aes_string(x="bp", y=YVALUE, color=shQuote("ph9")), size=1)+
+  ylim(0,300000)
 
 #log2 CPM
-plot + geom_line(data=P30_bins, aes(x=bp, y=log2(binned_cpm), color="ph5"), size=4)+
-  geom_line(data=P31_bins, aes(x=bp, y=log2(binned_cpm), color="ph5"), size=4)+
-  geom_line(data=P32_bins, aes(x=bp, y=log2(binned_cpm), color="ph7"), size=3)+
-  geom_line(data=P33_bins, aes(x=bp, y=log2(binned_cpm), color="ph7"), size=3)+
-  geom_line(data=P34_bins, aes(x=bp, y=log2(binned_cpm), color="ph7"), size=3)+
+plot + 
+  geom_line(data=P30_bins, aes(x=bp, y=log2(binned_cpm), color="ph5"), size=1.5)+
+  geom_line(data=P31_bins, aes(x=bp, y=log2(binned_cpm), color="ph5"), size=1.5)+
+  geom_line(data=P32_bins, aes(x=bp, y=log2(binned_cpm), color="ph7"), size=1)+
+  geom_line(data=P33_bins, aes(x=bp, y=log2(binned_cpm), color="ph7"), size=1)+
+  geom_line(data=P34_bins, aes(x=bp, y=log2(binned_cpm), color="ph7"), size=1)+
   geom_line(data=P35_bins, aes(x=bp, y=log2(binned_cpm), color="ph9"), size=1)+
   geom_line(data=P36_bins, aes(x=bp, y=log2(binned_cpm), color="ph9"), size=1)+
   scale_color_manual(values=cols, name="Condition")+
@@ -168,6 +399,7 @@ plot + geom_line(data=P30_bins, aes(x=bp, y=log2(binned_cpm), color="ph5"), size
         panel.background = element_blank(), axis.line = element_line(colour = "black"))+ 
   ylab("Log10 Counts per million")+
   xlab("Genome Position")
+
 
 #### put all binning data into one data frame 
 all_bins <- rbind(P30_bins, P31_bins, P32_bins, P33_bins,P34_bins, P35_bins, P36_bins)
@@ -183,6 +415,24 @@ averages_bins <- cbind(pH5_avg, pH7_avg, pH9_avg)
 averages_bins <- cbind(averages_bins, P30_bins$bp, P30_bins$scaffold, P30_bins$position)
 colnames(averages_bins)<- c("pH5", "pH7","pH9", "bp", "scaffold", "scaffold.position")
 
+pH5_avg.hkg <- as.data.frame(P30_bins$hkg_norm+P31_bins$hkg_norm)/2
+pH7_avg.hkg <- as.data.frame(P32_bins$hkg_norm+P33_bins$hkg_norm + P34_bins$hkg_norm)/3
+pH9_avg.hkg <- as.data.frame(P35_bins$hkg_norm + P36_bins$hkg_norm)/2
+averages_bins <- cbind(pH5_avg, pH7_avg, pH9_avg)
+averages_bins <- cbind(averages_bins, P30_bins$bp, P30_bins$scaffold, P30_bins$position)
+averages_bins <- cbind(averages_bins, pH5_avg.hkg, pH7_avg.hkg, pH9_avg.hkg  )
+colnames(averages_bins)<- c("pH5", "pH7","pH9", "bp", "scaffold", "scaffold.position", 
+                            "pH5.hkg", "pH7.hkg", "pH9.hkg")
+
+
+pH5_avg.gw <- as.data.frame(P30_bins_cov$avg_norm+P31_bins_cov$avg_norm)/2
+pH7_avg.gw <- as.data.frame(P32_bins_cov$avg_norm+P33_bins_cov$avg_norm + P34_bins_cov$avg_norm)/3
+pH9_avg.gw<- as.data.frame(P35_bins_cov$avg_norm + P36_bins$avg_norm)/2
+averages_bins.gw <- cbind(pH5_avg.gw, pH7_avg.gw, pH9_avg.gw)
+averages_bins.gw <- cbind(averages_bins.gw, P30_bins$bp, P30_bins$scaffold, P30_bins$position)
+
+colnames(averages_bins.gw)<- c("pH5.gw", "pH7.gw","pH9.gw", "bp", "scaffold", "scaffold.position")
+
 ## calculate log2FC for different groups
 averages_bins <- averages_bins %>%
   mutate(log2fc_ph57 = log2(pH5/pH7) )
@@ -191,13 +441,49 @@ averages_bins <- averages_bins %>%
 averages_bins <- averages_bins %>%
   mutate(log2fc_ph59 = log2(pH5/pH9) )
 
+averages_bins <- averages_bins %>%
+  mutate(log2fc_ph57.hkg = log2(pH5.hkg/pH7.hkg) )
+averages_bins <- averages_bins %>%
+  mutate(log2fc_ph97.hkg = log2(pH9.hkg/pH7.hkg) )
+averages_bins <- averages_bins %>%
+  mutate(log2fc_ph59.hkg = log2(pH5.hkg/pH9.hkg) )
+
+
+averages_bins.gw <- averages_bins.gw %>%
+  mutate(log2fc_ph57.gw = log2(pH5.gw/pH7.gw) )
+averages_bins.gw <- averages_bins.gw %>%
+  mutate(log2fc_ph97.gw = log2(pH9.gw/pH7.gw) )
+averages_bins.gw <- averages_bins.gw %>%
+  mutate(log2fc_ph59.gw = log2(pH5.gw/pH9.gw) )
+
+averages_bins_all <- cbind(averages_bins, averages_bins.gw)
+averages_bins_all <- averages_bins_all[,-(13:15)]
+
 ## Filter by logFC 
 ## log2(fc) > 1 or < -1
 ## filter out low counts (only bins with > 1)
-pH5_pH7 <- averages_bins[,1:7] %>%
+
+
+pH5_pH7 <- averages_bins_all %>%
   filter(pH5 > 1) %>% 
   filter(pH7 >1) %>%
-  filter(log2fc_ph57 > 1 | log2fc_ph57 < -1) 
+  filter(log2fc_ph57.gw > 1 | log2fc_ph57.gw < -1) 
+
+#pH5_pH7.hkg <- averages_bins %>%
+  filter(pH5 > 1) %>% 
+  filter(pH7 > 1) %>%
+  filter(log2fc_ph57.hkg > 1 | log2fc_ph57.hkg < -1) 
+
+pH7_pH9 <- averages_bins %>%
+  filter(pH7 > 1) %>% 
+  filter(pH9 > 1) %>%
+  filter(log2fc_ph97 > 1 | log2fc_ph97 < -1) 
+
+#pH7_pH9.hkg <- averages_bins %>%
+  filter(pH7 > 1) %>%   #### filter by cpm 
+  filter(pH9 > 1) %>%
+  filter(log2fc_ph97.hkg > 1 | log2fc_ph97.hkg < -1) 
+
 
 ################################
 ######## Operon identification
@@ -205,71 +491,109 @@ pH5_pH7 <- averages_bins[,1:7] %>%
 
 ## function to identify operons (maybe?)
 ## set number of bins to 20 (2000 bp up or down regulated)
-example <- pH5_pH7[1:20,]
+
 ### this is the function
+### input dataframe must have bp in 4th column
+
+
 sig.operons.function <- function(df, number_bins, df_name) {
+#set variables 
 previous.position = 0
-counter = 0
+counter = 1
 df_output <- c()
 temp.operon <- c()
 n=0
+# ENTER LOOP 
 for (i in 1:nrow(df)) {
-  if (df[i,4] == previous.position + 100) {
+  # If the suceeding row is the next bin or the 2nd bin 
+  # then add 1 to counter
+  # allows for 100 bp bins that do not follow trend of up or down reg
+  if (df[i,4] == (previous.position + 100) | df[i,4] == (previous.position + 200)) {
     counter = counter + 1
-  } else {
+  }  else { # exit the counter once we fail to get succeeding bins
     if (counter > number_bins) {
+      #if number of bins exceeds user threshold 
+      # then make data frame with info about operons
+      # assign bins to operon number 
       n= n+1
       temp.operon <- df[(i-(counter-1)):i-1,]
       temp.operon <- temp.operon %>%
         mutate(operon_no = n)
-      df_output <- rbind(df_output, temp.operon)
+      df_output <- rbind(df_output, temp.operon) ## append to dataframe
     }
-    counter=1
+    counter=1 #reset counter to 1 
   }
   previous.position=df[i,4]
-}
+} # EXIT LOOP 
 assign(paste(df_name),df_output, envir = .GlobalEnv)
-
 }
 
 ### user inputs input dataframe, number of bins (20 = 2000 bp limit), and output df name
-sig.operons.function(pH5_pH7, 19, "pH5_pH7_operons")
+
+sig.operons.function(pH5_pH7, 19, "pH5_pH7_operons.gw")
+sig.operons.function(pH7_pH9.hkg, 9, "pH9_pH7_operons.hkg")
 
 ###### 
 ###### filter gtf table so that we get genes falling within this operon
 
-data=subset(pH5_pH7_operons, operon_no == "1")
-scaffold.position<-data$scaffold.position
-scaffold.position.1 <- scaffold.position[1]
-scaffold.position.last <- scaffold.position[length(scaffold.position)]
-subsetgtf <- subset(GTF, scaffold == "scaffold3.1")
-subsetgtf<- subsetgtf %>% filter (start > scaffold.position.1 & stop < scaffold.position.last)
-# convert scaffold number to genome position to fit onto the graph 
-subsetgtf <- subsetgtf %>% 
-  mutate(genome.start = round(((980201-67192) + start)))
-subsetgtf <- subsetgtf %>% 
-  mutate(genome.stop = round(((980201-67192) + stop)))
+get.annotation.info <- function(df, number) {
+  data=subset(df, operon_no == paste(number))
+  scaffold.position<-data$scaffold.position
+  scaffold.position.first <- scaffold.position[1]
+  scaffold.position.last <- scaffold.position[length(scaffold.position)]
+  operon.length <- abs(scaffold.position.last - scaffold.position.first)
+  SCAFFOLD <- as.character(data$scaffold[1])
+  subsetgtf <- subset(GTF, scaffold == SCAFFOLD)
+  subsetgtf<- subsetgtf %>% filter (start > (scaffold.position.first - (operon.length/2))
+                                    & stop < scaffold.position.last + (operon.length/2))
+  # convert scaffold number to genome position to fit onto the graph 
+  CONVERT.FACTOR <- data$bp[1] - data$scaffold.position[1]
+  subsetgtf <- subsetgtf %>% 
+    mutate(genome.start = round(CONVERT.FACTOR + start))
+  subsetgtf <- subsetgtf %>% 
+    mutate(genome.stop = round(CONVERT.FACTOR + stop))
+assign("data", data, envir =  .GlobalEnv)
+assign("subsetgtf", subsetgtf, envir=.GlobalEnv)
+}
 
-######
-plot <- ggplot()
-plot + geom_line(data=data, aes(x=bp, y=pH5, color="ph5"))+
-  geom_line(data=data, aes(x=bp, y=pH7, color="ph7"), size=1) +
-  geom_line(data=data, aes(x=bp, y=pH9, color="ph9"), size=1) +
-  theme(axis.text.x=element_text(size=14),
-        axis.text.y=element_text(size=14, colour="black"),
-        axis.title.y=element_text(size=16),
-        axis.title.x=element_text(size=14, colour="black"),
-        panel.grid.major = element_blank(), panel.grid.minor = element_blank(),
-        panel.background = element_blank(), axis.line = element_line(colour = "black"))+ 
-  scale_color_manual(values=cols, name="Condition") + 
+get.annotation.info(pH5_pH7_operons.gw, 4)
+
+  plot <- ggplot()
+    plot + geom_line(data=data, aes(x=bp, y=pH5, color="ph5"))+
+      geom_line(data=data, aes(x=bp, y=pH7, color="ph7"), size=1) +
+      geom_line(data=data, aes(x=bp, y=pH9, color="ph9"), size=1) +
+      theme(axis.text.x=element_text(size=10),
+            axis.text.y=element_text(size=14, colour="black"),
+            axis.title.y=element_text(size=16),
+            axis.title.x=element_text(size=14, colour="black"),
+            panel.grid.major = element_blank(), panel.grid.minor = element_blank(),
+            panel.background = element_blank(), axis.line = element_line(colour = "black"))+ 
+      scale_color_manual(values=cols, name="Condition") + 
   #geom_segment()+
   xlab("Genome Position") +
-  ylab("Counts per million")+
-  ggtitle("Downregulated 'operon' in pH5")+
-  geom_segment(data=subsetgtf[1,], aes(x=genome.start, xend=genome.stop, y=0, yend=0), color="purple",
-               size=4)+
-  geom_label(data=subsetgtf[1,], aes(label=gene, x=genome.start,y=-25), fill="purple", size=3) +
-  geom_segment(data=subsetgtf[2,], aes(x=genome.start, xend=genome.stop, y=0, yend=0), color="green",
+  ylab("Normalized Coverage")+
+  ggtitle("Downregulated operon in pH5")+
+  geom_segment(data=subsetgtf[1,], aes(x=genome.start, xend=genome.stop, y=0, yend=0), color="purple",size=4)+
+      geom_segment(data=subsetgtf[2,], aes(x=genome.start, xend=genome.stop, y=0, yend=0), color="green",size=4)+
+    geom_segment(data=subsetgtf[3,], aes(x=genome.start, xend=genome.stop, y=0, yend=0), color="purple",size=4)+
+    #  geom_segment(data=subsetgtf[4,], aes(x=genome.start, xend=genome.stop, y=0, yend=0), color="purple",size=4) +
+    #  geom_segment(data=subsetgtf[5,], aes(x=genome.start, xend=genome.stop, y=0, yend=0), color="green",size=4)+
+      #geom_segment(data=subsetgtf[6,], aes(x=genome.start, xend=genome.stop, y=0, yend=0), color="purple",size=4)+
+ #geom_label(data=subsetgtf[1,], aes(label=gene, x=(genome.start+1500),y=-5), size=3, fill="purple")+
+    geom_label(data=subsetgtf[2,], aes(label=gene, x=(genome.start+1800),y=-5), size=3, fill="green")
+  #  geom_label(data=subsetgtf[4,], aes(label=gene, x=genome.start,y=-15), size=3, fill="purple")
+    
+      
+      
+    
+    
+  ### list of upregulated genes:
+      #### alkyl hyperoixde reductase protein C
+      ###  
+     +
+  
+      
+      geom_segment(data=subsetgtf[2,], aes(x=genome.start, xend=genome.stop, y=0, yend=0), color="green",
                size=4)+
   geom_label(data=subsetgtf[2,], aes(label=gene, x=982000,y=-50), fill="green", size=3) +
   geom_segment(data=subsetgtf[3,], aes(x=genome.start, xend=genome.stop, y=0, yend=0), color="purple",
