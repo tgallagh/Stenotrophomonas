@@ -171,6 +171,7 @@ slidingwindow <- function(windowsize, inputseq){
 #loop over samples
 
 ### bins for cpm
+### bins based off of CPM normalization 
 for (sample in sample.names) {
   temp <- get(sample)
   temp$bp <- rownames(temp)
@@ -186,6 +187,9 @@ for (sample in sample.names) {
 
 
 ### bins for coverage 
+### bins based off of non-normalized coverage 
+#### this should have non-normalized bp coverage in 3rd column of dataframe
+
 for (sample in sample.names) {
   temp <- get(sample)
   temp$bp <- rownames(temp)
@@ -217,16 +221,10 @@ P36_bins<- P36_bins %>%
 
 
 #### calculate average coverage for each sample
-
-
-  ### INPUT DATAFRAME MUST HAVE COLUMN LABELED "CPM"
-
-
 #### put dataframes into list to use apply function 
 LIST <- list(P30_bins, P31_bins, P32_bins,
                P33_bins, P34_bins, P35_bins, 
                P36_bins)
-
 #### Function for calculating average CPM across genome 
 average.coverage <- function(INPUT,OUTPUT){
   cpm.col <- as.numeric(INPUT$binned_cpm)
@@ -254,6 +252,9 @@ allcoverageaverage.bp<-lapply(LIST2, FUN= average.coverage.raw, OUTPUT="cov")
 allcoverageaverage.bp <- unlist(allcoverageaverage.bp)
 allcoverageaverage.bp <- cbind(allcoverageaverage.bp, sample.names)
 
+
+### normalize CPM bins by average coverage of CPM normalized 
+#### this is weird, don't know why I did it 
 
 P30_bins<- P30_bins %>%
   mutate(avg_norm = binned_cpm * 30 / as.numeric(allcoverageaverage[1,1]))
@@ -305,9 +306,11 @@ P36_bins_cov<- P36_bins_cov %>%
 plot <- ggplot()
 #color panel for different conditions 
 cols <- c("ph5"="red","ph7"="black","ph9"="blue")
-YVALUE = "avg_norm"
+YVALUE = "log2(avg_norm)"
 
-plot + geom_line(data=P30_bins, aes_string(x="bp", y=YVALUE, color=shQuote("ph5")), size=4)+
+
+######## GLOBAL PLOT FOR RNASEQ 
+plot + geom_line(data=P30_bins_cov, aes_string(x="bp", y=YVALUE, color=shQuote("ph5")), size=4)+
   scale_color_manual(values=cols, name="Condition")+
   theme(axis.text.x=element_text(size=14),
         axis.text.y=element_text(size=14, colour="black"),
@@ -318,13 +321,14 @@ plot + geom_line(data=P30_bins, aes_string(x="bp", y=YVALUE, color=shQuote("ph5"
   ylab("counts per million")+
   xlab("Genome Position") +
   ggtitle("Coverage of all samples normalized by \n mean genome-wide coverage")+
-  geom_line(data=P31_bins, aes_string(x="bp", y=YVALUE, color=shQuote("ph5")), size=4)+
-   geom_line(data=P32_bins, aes_string(x="bp", y=YVALUE, color=shQuote("ph7")),  size=3)+
-  geom_line(data=P33_bins, aes_string(x="bp", y=YVALUE, color=shQuote("ph7")), size=3)+
-  geom_line(data=P34_bins, aes_string(x="bp", y=YVALUE, color=shQuote("ph7")), size=3)+
-  geom_line(data=P35_bins, aes_string(x="bp", y=YVALUE, color=shQuote("ph9")), size=1)+
-  geom_line(data=P36_bins, aes_string(x="bp", y=YVALUE, color=shQuote("ph9")), size=1)+
-  ylim(0,300000)
+  geom_line(data=P31_bins_cov, aes_string(x="bp", y=YVALUE, color=shQuote("ph5")), size=4)+
+   geom_line(data=P32_bins_cov, aes_string(x="bp", y=YVALUE, color=shQuote("ph7")),  size=3)+
+  geom_line(data=P33_bins_cov, aes_string(x="bp", y=YVALUE, color=shQuote("ph7")), size=3)+
+  geom_line(data=P34_bins_cov, aes_string(x="bp", y=YVALUE, color=shQuote("ph7")), size=3)+
+  geom_line(data=P35_bins_cov, aes_string(x="bp", y=YVALUE, color=shQuote("ph9")), size=1)+
+  geom_line(data=P36_bins_cov, aes_string(x="bp", y=YVALUE, color=shQuote("ph9")), size=1)
+  
+ylim(0,300000)
 
 cols2 <-  c("ph5"="pink","ph7"="gray","ph9"="#42cbf4", 
             "ph5_hkg" = "red", "ph7_hkg" = "black", 
@@ -427,7 +431,7 @@ colnames(averages_bins)<- c("pH5", "pH7","pH9", "bp", "scaffold", "scaffold.posi
 
 pH5_avg.gw <- as.data.frame(P30_bins_cov$avg_norm+P31_bins_cov$avg_norm)/2
 pH7_avg.gw <- as.data.frame(P32_bins_cov$avg_norm+P33_bins_cov$avg_norm + P34_bins_cov$avg_norm)/3
-pH9_avg.gw<- as.data.frame(P35_bins_cov$avg_norm + P36_bins$avg_norm)/2
+pH9_avg.gw<- as.data.frame(P35_bins_cov$avg_norm + P36_bins_cov$avg_norm)/2
 averages_bins.gw <- cbind(pH5_avg.gw, pH7_avg.gw, pH9_avg.gw)
 averages_bins.gw <- cbind(averages_bins.gw, P30_bins$bp, P30_bins$scaffold, P30_bins$position)
 
@@ -498,39 +502,41 @@ pH7_pH9 <- averages_bins %>%
 
 sig.operons.function <- function(df, number_bins, df_name) {
 #set variables 
-previous.position = 0
-counter = 1
-df_output <- c()
-temp.operon <- c()
-n=0
+  PREVIOUS.POSITION = 0
+  COUNTER = 1
+  DF_OUTPUT <- c()
+  TEMP.OPERON <- c()
+  n=0
 # ENTER LOOP 
-for (i in 1:nrow(df)) {
-  # If the suceeding row is the next bin or the 2nd bin 
-  # then add 1 to counter
-  # allows for 100 bp bins that do not follow trend of up or down reg
-  if (df[i,4] == (previous.position + 100) | df[i,4] == (previous.position + 200)) {
-    counter = counter + 1
-  }  else { # exit the counter once we fail to get succeeding bins
-    if (counter > number_bins) {
-      #if number of bins exceeds user threshold 
-      # then make data frame with info about operons
-      # assign bins to operon number 
-      n= n+1
-      temp.operon <- df[(i-(counter-1)):i-1,]
-      temp.operon <- temp.operon %>%
-        mutate(operon_no = n)
-      df_output <- rbind(df_output, temp.operon) ## append to dataframe
+    for (i in 1:nrow(df)) {
+      # loop through rows that represent bin number in coverage data frame
+      # If the suceeding row is the next bin or the 2nd bin 
+           # then add 1 to counter
+      # allows for 100 bp bins that do not follow trend of up or down reg
+      if (df[i,4] == (PREVIOUS.POSITION + 100) 
+          | df[i,4] == (PREVIOUS.POSITION + 200)) {
+        COUNTER = COUNTER + 1
+      }  else { # exit the counter once we fail to get succeeding bins
+        if (COUNTER > number_bins) {
+          #if number of bins exceeds user threshold 
+          # then make data frame with info about operons
+          # assign bins to operon number 
+          n= n+1
+          TEMP.OPERON <- df[(i-(COUNTER-1)):i-1,]
+          TEMP.OPERON <- TEMP.OPERON %>%
+            mutate(operon_no = n)
+          df_output <- rbind(df_output, TEMP.OPERON) ## append to dataframe
+        }
+       COUNTER=1 #reset counter to 1 
+      }
+      previous.position=df[i,4]
+    } # EXIT LOOP 
+    assign(paste(df_name),df_output, envir = .GlobalEnv)
     }
-    counter=1 #reset counter to 1 
-  }
-  previous.position=df[i,4]
-} # EXIT LOOP 
-assign(paste(df_name),df_output, envir = .GlobalEnv)
-}
 
 ### user inputs input dataframe, number of bins (20 = 2000 bp limit), and output df name
 
-sig.operons.function(pH5_pH7, 19, "pH5_pH7_operons.gw")
+sig.operons.function(pH5_pH7, 10, "pH5_pH7_operons.gw")
 sig.operons.function(pH7_pH9.hkg, 9, "pH9_pH7_operons.hkg")
 
 ###### 
