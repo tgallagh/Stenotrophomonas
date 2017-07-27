@@ -57,11 +57,11 @@ echo "#FINAL CLEANED READS AFTER RRNA REMOVAL" >> $OUTPUT
 
 for i in $(seq 30 36); do
 echo SE_Final_P$i\ $'\t' "$(grep ^">" <P$i\_READ1_READ2_cat_unpaired.deconseq.clean.fasta \
-| wc -l)" >> $OUTPUT;
+| wc -l)" >> $OUTPUT
 echo  Forward_Final_P$i\ $'\t' "$(grep ^">" <P$i\_READ1_READ2_merged.fastq.unassembled.forward.deconseq.clean.paired.fasta \
-| wc -l)" >> $OUTPUT;
+| wc -l)" >> $OUTPUT
 echo Reverse_Final_P$i\ $'\t' "$(grep ^">" <P$i\_READ1_READ2_merged.fastq.unassembled.reverse.deconseq.clean.paired.fasta \ 
-| wc -l)" >> $OUTPUT;
+| wc -l)" >> $OUTPUT
 done
 
 
@@ -90,8 +90,6 @@ echo Final_Overlapped_Align_P$i\ $'\t' $(cat P$i\_singles.stats.temp | head -5 |
 done
 
 rm -f *stats.temp
-
-
 
 
 
