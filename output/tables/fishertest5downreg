@@ -1,0 +1,53 @@
+p-value	genegroup
+1	Cofactors, Vitamins, Prosthetic Groups, Pigments
+0.0738983605844809	Cell Wall and Capsule
+0.0434155183620976	Virulence, Disease and Defense
+1	Potassium metabolism
+0.636652440556644	Miscellaneous
+1	Phages, Prophages, Transposable elements, Plasmids
+0.164809601508572	Membrane Transport
+1	Iron acquisition and metabolism
+0.794774031007908	RNA Metabolism
+0.722988632054358	Nucleosides and Nucleotides
+0.00130614733713421	Protein Metabolism
+0.623640126978	Cell Division and Cell Cycle
+0.0309063847656894	Motility and Chemotaxis
+1	Regulation and Cell signaling
+1	Secondary Metabolism
+0.110067980317812	DNA Metabolism
+0.535311280960748	Fatty Acids, Lipids, and Isoprenoids
+1	Nitrogen Metabolism
+1	Dormancy and Sporulation
+0.525374394057028	Respiration
+1	Stress Response
+0.0667915075718636	Metabolism of Aromatic Compounds
+0.000216998312312295	Amino Acids and Derivatives
+1	Sulfur Metabolism
+1	Phosphorus Metabolism
+1	Carbohydrates
+0.684887049875622	Cofactors, Vitamins, Prosthetic Groups, Pigments
+1	Cell Wall and Capsule
+0.0355800502235082	Virulence, Disease and Defense
+1	Potassium metabolism
+1	Miscellaneous
+1	Phages, Prophages, Transposable elements, Plasmids
+0.971182248509004	Membrane Transport
+0.760537420387867	Iron acquisition and metabolism
+0.782674006397648	RNA Metabolism
+0.894861666685718	Nucleosides and Nucleotides
+1	Protein Metabolism
+1	Cell Division and Cell Cycle
+0.0309063847656894	Motility and Chemotaxis
+0.848635464750657	Regulation and Cell signaling
+1	Secondary Metabolism
+1	DNA Metabolism
+0.340178330438174	Fatty Acids, Lipids, and Isoprenoids
+1	Nitrogen Metabolism
+1	Dormancy and Sporulation
+0.945784053028218	Respiration
+0.635904563159053	Stress Response
+0.0667915075718636	Metabolism of Aromatic Compounds
+0.000216998312312295	Amino Acids and Derivatives
+1	Sulfur Metabolism
+0.664016189952812	Phosphorus Metabolism
+0.679969841395726	Carbohydrates

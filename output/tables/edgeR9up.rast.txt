@@ -1,0 +1,6 @@
+Name	KEGG	Smlt	RAST	logFC	logCPM	LR	PValue	FDR	Protein Family	Metabolism					
+Name=Thiamin_biosynthesis_protein_ThiC	K03147	Smlt3909	fig|6666666.230262.peg.1233	1.222412544	8.2141991	159.5105758	1.45E-36	6.27E-33	Enzymes	Metabolism of cofactors and vitamins		"Cofactors, Vitamins, Prosthetic Groups, Pigments"	"Cofactors, Vitamins, Prosthetic Groups, Pigments - no subcategory"	Thiamin biosynthesis	Thiamin biosynthesis protein ThiC
+Name=ATP_phosphoribosyltransferase_(EC_2.4.2.17)	"	K00765"	Smlt2162	fig|6666666.230262.peg.2615	1.370425528	7.15493418	120.9435566	3.93E-28	4.26E-25	Enzymes	Amino Acid Metabolism				
+Name=His_repressor			fig|6666666.230262.peg.2616	1.655030736	7.063876218	128.6970692	7.90E-30	1.14E-26							
+Name=Galactosamine-6-phosphate_isomerase_(EC_5.3.1.-)	K02082		fig|6666666.230262.peg.3404	1.163276423	4.992133025	16.78671969	4.18E-05	0.004529647	Enzymes			Carbohydrates	Aminosugars	N-Acetyl-Galactosamine and Galactosamine Utilization	Galactosamine-6-phosphate isomerase (EC 5.3.1.-)
+Name=Ferrichrome-iron_receptor	K02014		fig|6666666.230262.peg.3787	1.023821029	7.469189249	99.59239795	1.87E-23	1.62E-20	Transporters						

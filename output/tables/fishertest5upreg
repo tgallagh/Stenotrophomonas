@@ -1,0 +1,27 @@
+p-value	genegroup
+0.973480006191888	Cofactors, Vitamins, Prosthetic Groups, Pigments
+0.732902584379761	Cell Wall and Capsule
+0.0540485646591024	Virulence, Disease and Defense
+1	Potassium metabolism
+1	Miscellaneous
+0.350357998926943	Phages, Prophages, Transposable elements, Plasmids
+0.91715156798398	Membrane Transport
+0.298682856700169	Iron acquisition and metabolism
+0.959474895679435	RNA Metabolism
+1	Nucleosides and Nucleotides
+0.770356347217784	Protein Metabolism
+0.566100757973853	Cell Division and Cell Cycle
+1	Motility and Chemotaxis
+1	Regulation and Cell signaling
+0.194412732648979	Secondary Metabolism
+0.633071529418684	DNA Metabolism
+0.897407635019192	Fatty Acids, Lipids, and Isoprenoids
+1	Nitrogen Metabolism
+1	Dormancy and Sporulation
+0.178779421228653	Respiration
+0.715065605321914	Stress Response
+1	Metabolism of Aromatic Compounds
+0.475035881373152	Amino Acids and Derivatives
+0.00300018403910732	Sulfur Metabolism
+1	Phosphorus Metabolism
+0.265021665818479	Carbohydrates

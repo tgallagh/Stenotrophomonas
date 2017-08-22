@@ -1,0 +1,3 @@
+Name	KEGG	Smlt	RAST	logFC	logCPM	LR	PValue	FDR	Protein Family	Metabolism
+Name=Succinate-semialdehyde_dehydrogenase_[NAD]_(EC_1.2.1.24)%3B_Succinate-semialdehyde_dehydrogenase_[NAD(P)+]_(EC_1.2.1.16)	K08324	Smlt2230	fig|6666666.230262.peg.3167	-1.511333264	6.69819198	153.1317207	3.58E-35	7.77E-32	Enzymes	"Carbohydrate metabolism, Amino acid metabolism,  Metabolism of cofactors and vitamins"
+Name=hypothetical_protein			fig|6666666.230262.peg.4194	-1.96276067	2.629583458	10.67430881	0.001086338	0.046137163		
