@@ -58,7 +58,7 @@ get.annotation.info <- function(df, number) {
   assign("subsetgtf", subsetgtf, envir=.GlobalEnv)
 }
 
-get.annotation.info(up97, 1)
+get.annotation.info(down57, 5)
 
 cols <- c("pH5"="red","pH7"="black","pH9"="blue")
 first <- subsetgtf[1,11]

@@ -118,8 +118,10 @@ SAMPLE.COLORS<- c("P30"="red", "P31" = "red" ,
                   "P32" = "black", "P33" = "black",
                   "P34" = "black", "P35" = "blue" ,
                   "P36" = "blue") 
+color <- c("pH5" = "red",
+           "pH7" = "black",
+           "pH9" = "blue")
 ### this function will give single bp resolution for a gene of interest
-
 make.gene.plots <- function(x) {
   GENE.INFO <- subset(GTF, gene == x)
   GENE.START <- GENE.INFO$start
@@ -143,7 +145,61 @@ make.gene.plots <- function(x) {
     xlab("Genome position")+
     ggtitle(paste(x))
 }
+##########################################
+#### plot to compare normalization methods
+##########################################
+#read in edgeR-normalized single bp counts
+norm.counts <- read.table(file="~/GoogleDrive/Stenotrophomonas/data/processed/edgeR/singlebp.norm.counts")
+ALL.COV.RAW$genome.bp <- seq(1: nrow(ALL.COV.RAW))
+norm.counts$genome.bp <- seq(1: nrow(norm.counts))
+colnames(norm.counts) <- c("P30", "P31", "P32", "P33", "P34", "P35", "P36", "genome.bp")
+COLOR.PANEL<- c("pH5 Raw"="#DA5E5E", "pH9 Raw" = "#5E87DA" ,
+                  "pH7 Raw" = "#484C54", "pH5 norm" = "red",
+                "pH7 norm" = "black", "pH9 norm" = "blue") 
 
+plot <- ggplot()
+plot+geom_line(data=ALL.COV.RAW, aes(x=genome.bp, y=log10(P30)), color="#DA5E5E")+
+  scale_color_manual(values=color, name="Condition")  +
+  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(),
+        panel.background = element_blank(), axis.line = element_line(colour = "black"))+
+  xlab("Genome position") + ylab("Log10 Coverage")+
+  geom_line(data=ALL.COV.RAW, aes(x=genome.bp, y=log10(P31)), color="#DA5E5E")+
+  geom_line(data=ALL.COV.RAW, aes(x=genome.bp, y=log10(P32)), color="#484C54")+
+  geom_line(data=ALL.COV.RAW, aes(x=genome.bp, y=log10(P33)), color="#484C54")+
+  geom_line(data=ALL.COV.RAW, aes(x=genome.bp, y=log10(P34)), color="#484C54")+
+  geom_line(data=ALL.COV.RAW, aes(x=genome.bp, y=log10(P35)), color="#5E87DA")+
+  geom_line(data=ALL.COV.RAW, aes(x=genome.bp, y=log10(P36)), color="#5E87DA")+
+  geom_line(data=norm.counts, aes(x=genome.bp, y=log10(P30), color="pH5"))+
+  geom_line(data=norm.counts, aes(x=genome.bp, y=log10(P31), color="pH5"))+
+  geom_line(data=norm.counts, aes(x=genome.bp, y=log10(P32), color="pH7"))+
+  geom_line(data=norm.counts, aes(x=genome.bp, y=log10(P33), color="pH7"))+
+  geom_line(data=norm.counts, aes(x=genome.bp, y=log10(P34), color="pH7"))+
+  geom_line(data=norm.counts, aes(x=genome.bp, y=log10(P35), color="pH9"))+
+  geom_line(data=norm.counts, aes(x=genome.bp, y=log10(P36), color="pH9"))
+
+plot+ 
+  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(),
+        panel.background = element_blank(), axis.line = element_line(colour = "black"))+
+  xlab("Genome position") + ylab("Log10 Coverage")+
+  geom_line(data=ALL.COV, aes(x=genome.bp, y=log10(P30), color="pH5"))+
+  geom_line(data=ALL.COV, aes(x=genome.bp, y=log10(P31), color="pH5"))+
+  geom_line(data=ALL.COV, aes(x=genome.bp, y=log10(P32), color="pH7"))+
+  geom_line(data=ALL.COV, aes(x=genome.bp, y=log10(P33), color="pH7"))+
+  geom_line(data=ALL.COV, aes(x=genome.bp, y=log10(P34), color="pH7"))+
+  geom_line(data=ALL.COV, aes(x=genome.bp, y=log10(P35), color="pH9"))+
+  geom_line(data=ALL.COV, aes(x=genome.bp, y=log10(P36), color="pH9"))+
+  geom_line(data=ALL.COV.RAW, aes(x=genome.bp, y=log10(P31)), color="#DA5E5E")+
+  geom_line(data=ALL.COV.RAW, aes(x=genome.bp, y=log10(P32)), color="#484C54")+
+  geom_line(data=ALL.COV.RAW, aes(x=genome.bp, y=log10(P33)), color="#484C54")+
+  geom_line(data=ALL.COV.RAW, aes(x=genome.bp, y=log10(P34)), color="#484C54")+
+  geom_line(data=ALL.COV.RAW, aes(x=genome.bp, y=log10(P35)), color="#5E87DA")+
+  geom_line(data=ALL.COV.RAW, aes(x=genome.bp, y=log10(P36)), color="#5E87DA")+
+geom_line(data=ALL.COV.RAW, aes(x=genome.bp, y=log10(P30)), color="#DA5E5E")+
+  scale_color_manual(values=color, name="Condition")
+
+#########################################################
+#### GENE PLOTS
+########################################################
 ### make.gene.plots(x) <--- change x to put gene of interest 
 x = "DNA gyrase subunit A (EC 5.99.1.3);Ontology_term=KEGG_ENZYME:5.99.1.3"
 make.gene.plots(x)
@@ -155,8 +211,6 @@ x = GTF[3572,10] #"DNA directed RNA polymerase Beta subunit"
 make.gene.plots(x) 
 x = GTF[3864,10] #"DNA directed RNA polymerase Beta subunit"
 make.gene.plots(x)
-
-
 ### Calculate the average log2FC difference between pH5, pH7, pH9 groups
 calc.log.fc.hk <- function(x) {
   GENE.INFO <- subset(GTF, gene == x)
@@ -184,7 +238,6 @@ calc.log.fc.hk <- function(x) {
   name1 <- paste("FC",x,sep="_")
   assign(name1,temp,envir = .GlobalEnv)
   }
-
 LIST.HK <- list(GTF[969,10], GTF[2727,10], 
                 GTF[3924,10], GTF[3572,10],
                 GTF[3864,10])

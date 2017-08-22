@@ -56,19 +56,20 @@ setwd("/Users/Tara/GoogleDrive/Stenotrophomonas/data/processed/bowtie2/coverage/
 # for loop for reading in all data files with sample name listed in sample.names
 # note, suffix of coverage file name must be "_final.coverage.txt" 
 # and prefix must be sample name
+SAMPLE.NAMES <- c("P30", "P31", "P32", "P33", "P34", "P35", "P36") 
 for (file in SAMPLE.NAMES) {
   temp <- read.delim(paste(file,"_final.coverage.txt",sep=""),header=FALSE)
   colnames(temp) <- c("scaffold", "position", "coverage")
   assign(file,temp)
 }
 ALL.COV.raw <- cbind(as.data.frame(P30$coverage),
-                 P31$coverage, P32$coverage, P33$coverage, P34$coverage,
-                 P35$coverage, P36$coverage)
+                     P31$coverage, P32$coverage, P33$coverage, P34$coverage,
+                     P35$coverage, P36$coverage)
 ALL.COV.raw$bp <- c(1:nrow(ALL.COV.raw))
 colnames(ALL.COV.raw) <- c("bp", "P30",
-                       "P31", "P32", "P33",
-                       "P34", "P35", "P36")
-ALL.COV.raw <- ALL.COV.raw %>% mutate(P30 = as.numeric(as.character(P30))+1))
+                           "P31", "P32", "P33",
+                           "P34", "P35", "P36")
+ALL.COV.raw <- ALL.COV.raw %>% mutate(P30 = as.numeric(as.character(P30))+1)
 samples2 <- cbind(groups, colnames(ALL.COV.raw[2:8]))
 counts.matrix2 <- ALL.COV.raw[,-1]
 rownames(counts.matrix2) <- ALL.COV.raw[,1]
@@ -80,16 +81,16 @@ cpm2<-(cpm(d2))
 #returns counts per mILLION FROM A DGElist
 #divides raw counts by library size and then multiplies by 1 mil
 total_gene2<-apply(d2$counts, 2, sum) # total gene counts per sample
-keep2 <- rowSums(cpm(d)>1) >= 2
-d <- d[keep,]
-dim(d)
+keep2 <- rowSums(cpm(d2)>0)
+d2 <- d2[keep,]
+dim(d2)
 #Recalculate library sizes of the DGEList object
-d$samples$lib.size <- colSums(d$counts)
-d$samples
+d2$samples$lib.size <- colSums(d2$counts)
+d2$samples
 #calcNormFactors" function normalizes for RNA composition
 #it finds a set of scaling factors for the library sizes (i.e. number of reads in a sample)
 #that minimize the log-fold changes between the samples for most genes 
-d.norm<- calcNormFactors(d)
+d2.norm<- calcNormFactors(d2)
 #plot MDS - multi-dimensional scaling plot of the RNA samples in which distances correspond to leading log-fold-changes between each pair of RNA samples. 
 tiff("bin_NMDS_plot.tiff")
 plotMDS<-plotMDS(d, method="bcv", col=as.numeric(d$samples$group))
@@ -113,9 +114,6 @@ colnames(design) <- levels(fac)
 d.norm<- estimateGLMCommonDisp(d.norm, design)
 d.norm <- estimateGLMTrendedDisp(d.norm, design)
 d.norm <- estimateGLMTagwiseDisp(d.norm, design)
-counts.export<-cpm(d, normalized.lib.sizes=TRUE)
-write.table(x=counts.export, file="~/GoogleDrive/Stenotrophomonas/data/processed/edgeR/gene.counts.edgeR.txt",
-            quote=FALSE,sep="\t")
 #mean variance plot
 #grey = raw variance
 #light blue = tagwise dispersion varaince
@@ -446,11 +444,11 @@ SUBSET.GTF <- GTF %>%
   filter(start > SCAFFOLD.POSITION.START |
            start > SCAFFOLD.POSITION.STOP) %>%
   filter(stop < SCAFFOLD.POSITION.STOP)
-         
-         |
-           stop > SCAFFOLD.POSITION.START)
-  
-  | 
-          start < SCAFFOLD.POSITION.STOP)
+
+|
+  stop > SCAFFOLD.POSITION.START)
+
+| 
+  start < SCAFFOLD.POSITION.STOP)
 
 
