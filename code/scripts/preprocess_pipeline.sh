@@ -8,6 +8,7 @@
 
 #### Pipeline for quality filtering and aligning Sm RNAseq data
 
+### 
 
 #load modules
 #have to purge before using QIIME
