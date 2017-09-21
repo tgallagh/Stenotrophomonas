@@ -28,7 +28,7 @@ cd  /bio/tgallagh/Stenotrophomonas/data/processed/CFdata/Whiteley/fastq
 
 
 cd /bio/tgallagh/Stenotrophomonas/data/processed/CFdata/Whiteley/derep 
-input=derep.Rn_Meta_Invivo_HumanSputum_2016_JLD_HumanDanishSputum_A.trimmed.fastq.fastq
+input=/bio/tgallagh/Stenotrophomonas/data/processed/CFdata/Whiteley/derepderep.Rn_Meta_Invivo_HumanSputum_2016_JLD_HumanDanishSputum_E.trimmed.fastq.fastq
 DEST=/bio/tgallagh/Stenotrophomonas/data/processed/CFdata/Whiteley/prinseqreports/derep
 
 prinseq-lite.pl -fastq $input -graph_data $DEST$input\.gd -graph_stats ld,gc,qd,ns,pt,ts,aq,de,da,sc,dn
