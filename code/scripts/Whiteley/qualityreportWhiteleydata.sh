@@ -4,7 +4,7 @@
 #$ -m e
 #$ -pe make 8 
 #$ -R y
-#$ -t 1
+#$ -t 1-7
 
 # script for prinseq-lite quality report of raw Whiteley Mtr reads
 module load prinseq-lite/0.20.4 
@@ -17,19 +17,17 @@ cd  /bio/tgallagh/Stenotrophomonas/data/processed/CFdata/Whiteley/fastq
 #prinseq-lite.pl -fastq $input -graph_data $DEST$input\.gd -graph_stats ld,gc,qd,ns,pt,ts,aq,de,da,sc,dn
 
 # preinseq report of quality filtered reads (set 1) 
-#FILENAMES=/bio/tgallagh/Stenotrophomonas/data/processed/CFdata/Whiteley/trimmed/filenames.txt
-#input=$(head -n $SGE_TASK_ID $FILENAMES | tail -n 1)
-#cd /bio/tgallagh/Stenotrophomonas/data/processed/CFdata/Whiteley/trimmed/
-
-#DEST=/bio/tgallagh/Stenotrophomonas/data/processed/CFdata/454data/prinseqreports/qualityfilteredset1
-
-
-# prinseq-lite.pl -fastq $input -graph_data $DEST$input\.gd -graph_stats ld,gc,qd,ns,pt,ts,aq,de,da,sc,dn
-
-
-cd /bio/tgallagh/Stenotrophomonas/data/processed/CFdata/Whiteley/derep 
-input=/bio/tgallagh/Stenotrophomonas/data/processed/CFdata/Whiteley/derepderep.Rn_Meta_Invivo_HumanSputum_2016_JLD_HumanDanishSputum_E.trimmed.fastq.fastq
-DEST=/bio/tgallagh/Stenotrophomonas/data/processed/CFdata/Whiteley/prinseqreports/derep
+FILENAMES=/bio/tgallagh/Stenotrophomonas/data/processed/CFdata/Whiteley/trimmedfinal/filenames.txt
+input=$(head -n $SGE_TASK_ID $FILENAMES | tail -n 1)
+cd /bio/tgallagh/Stenotrophomonas/data/processed/CFdata/Whiteley/trimmedfinal/
+DEST=/bio/tgallagh/Stenotrophomonas/data/processed/CFdata/Whiteley/prinseqreports/trimmedfinal/
 
 prinseq-lite.pl -fastq $input -graph_data $DEST$input\.gd -graph_stats ld,gc,qd,ns,pt,ts,aq,de,da,sc,dn
+
+
+#cd /bio/tgallagh/Stenotrophomonas/data/processed/CFdata/Whiteley/derep 
+#input=/bio/tgallagh/Stenotrophomonas/data/processed/CFdata/Whiteley/derepderep.Rn_Meta_Invivo_HumanSputum_2016_JLD_HumanDanishSputum_E.trimmed.fastq.fastq
+#DEST=/bio/tgallagh/Stenotrophomonas/data/processed/CFdata/Whiteley/prinseqreports/derep
+
+#prinseq-lite.pl -fastq $input -graph_data $DEST$input\.gd -graph_stats ld,gc,qd,ns,pt,ts,aq,de,da,sc,dn
 
