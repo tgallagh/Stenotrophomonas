@@ -2,5 +2,4 @@
 ## Phylogenomics
 ### Scripts
 ### Data
-
-   153 strain tree using 21 marker genes: 
+* 153 strain tree using 21 marker genes: 
