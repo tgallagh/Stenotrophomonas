@@ -10,8 +10,22 @@
 
 ## Metabolomics
 ### &nbsp;&nbsp; Scripts
-*  
-### Data
+*  PCOA and volcano plots of metabolomics data in R: [/code/scripts/R]("https://github.com/tgallagh/Stenotrophomonas/blob/master/code/scripts/R/metabolites_pcoa_volcanoplot_fig4_figs3.R") 
+### &nbsp;&nbsp; Data
 * metabolomics data from WCMC: [/data/metabolomics](https://github.com/tgallagh/Stenotrophomonas/tree/master/data/metabolomics)
 
+## Transcriptomics
+### &nbsp;&nbsp; Scripts
+### &nbsp;&nbsp; Data
+
+## Metaranscriptomics
+### &nbsp;&nbsp; Scripts
+* quality filter data in linux environment: [/code/scripts/Metatranscriptome](https://github.com/tgallagh/Stenotrophomonas/blob/master/code/scripts/Metatranscriptome/qualityfilter_Whiteley.sh)
+* align to non-Steno CF database: [/code/scripts/Metatranscriptome](https://github.com/tgallagh/Stenotrophomonas/blob/master/code/scripts/Metatranscriptome/bowtie1_CFdatabase.sh)
+* align left-overs to Steno pan-genome:[/code/scripts/Metatranscriptome](https://github.com/tgallagh/Stenotrophomonas/blob/master/code/scripts/Metatranscriptome/bowtie2_invitro_pangenome.sh)
+* look at gene alignments:   [/code/scripts/Metatranscriptome](https://github.com/tgallagh/Stenotrophomonas/blob/master/code/scripts/Metatranscriptome/pangenomealignments.R)
+* look at gene hits in sputum E and F: [/code/scripts/Metatranscriptome](https://github.com/tgallagh/Stenotrophomonas/blob/master/code/scripts/Metatranscriptome/calculate_pangenome_hits.R)
+### &nbsp;&nbsp; Data
+* From Marvin Whiteley's Lab: https://www.pnas.org/content/115/22/E5125.short
+ 
 
