@@ -10,7 +10,7 @@
 
 ## Metabolomics
 ### &nbsp;&nbsp; Scripts
-*  PCOA and volcano plots of metabolomics data in R: [/code/scripts/R]("https://github.com/tgallagh/Stenotrophomonas/blob/master/code/scripts/R/metabolites_pcoa_volcanoplot_fig4_figs3.R") 
+*  PCOA and volcano plots of metabolomics data in R: [/code/scripts/R](https://github.com/tgallagh/Stenotrophomonas/blob/master/code/scripts/R/metabolites_pcoa_volcanoplot_fig4_figs3.R) 
 ### &nbsp;&nbsp; Data
 * metabolomics data from WCMC: [/data/metabolomics](https://github.com/tgallagh/Stenotrophomonas/tree/master/data/metabolomics)
 
@@ -18,7 +18,7 @@
 ### &nbsp;&nbsp; Scripts
 ### &nbsp;&nbsp; Data
 
-## Metaranscriptomics
+## Metranscriptomics
 ### &nbsp;&nbsp; Scripts
 * quality filter data in linux environment: [/code/scripts/Metatranscriptome](https://github.com/tgallagh/Stenotrophomonas/blob/master/code/scripts/Metatranscriptome/qualityfilter_Whiteley.sh)
 * align to non-Steno CF database: [/code/scripts/Metatranscriptome](https://github.com/tgallagh/Stenotrophomonas/blob/master/code/scripts/Metatranscriptome/bowtie1_CFdatabase.sh)
