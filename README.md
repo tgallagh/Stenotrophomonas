@@ -8,7 +8,7 @@
 
 
 ## Metabolomics
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;### Scripts
+### &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Scripts
 * 
 ### Data
 * metabolomics data from WCMC: [/data/metabolomics](https://github.com/tgallagh/Stenotrophomonas/tree/master/data/metabolomics)
